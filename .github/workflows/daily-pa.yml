@@ -1,0 +1,30 @@
+name: Daily PA
+
+on:
+  schedule:
+    - cron: '15 6 * * *' # 07:15 Europe/Amsterdam ~ 06:15 UTC (DST varies)
+  workflow_dispatch: {}
+
+env:
+  TZ: Europe/Amsterdam
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Daily PA once
+        env:
+          PYTHONPATH: .
+        run: |
+          . .venv/bin/activate
+          python -m src.main --once
